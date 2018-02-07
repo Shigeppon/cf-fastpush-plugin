@@ -122,12 +122,15 @@ func (c *FastPushPlugin) FastPush(cliConnection plugin.CliConnection, appName st
 
 	authToken := c.GetAuthToken(cliConnection, appName)
 
+	fmt.Println(authToken, "\n")
+
 	if dryRun {
 		// NEED TO HANDLE DRY RUN
 		c.ui.Warn("warning: No changes will be applied, this is a dry run !!")
 	}
 
 	apiEndpoint := c.GetApiEndpoint(cliConnection, appName)
+	fmt.Println(apiEndpoint, "\n")
 	request := gorequest.New()
 	response, body, err := request.Get(apiEndpoint + "/files").Set("x-auth-token", authToken).End()
 	if err != nil {
@@ -228,11 +231,12 @@ func (c *FastPushPlugin) GetApiEndpoint(cliConnection plugin.CliConnection, appN
 	}
 
 	for _, line := range results {
-		match, _ := regexp.MatchString("^urls:.*", line)
+		match, _ := regexp.MatchString("^URL:.*", line)
 		if match {
 			parts := strings.Fields(line)
+
 			if len(parts) > 1 {
-				return "https://" + parts[1] + "/_fastpush"
+				return "http://" + parts[1] + "/_fastpush"
 			}
 		}
 	}
